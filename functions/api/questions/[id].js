@@ -7,8 +7,8 @@ async function ids(env, x) {
 export async function onRequestPut({ request, env, params }) {
   const denied = requireTeacher(await me(request, env)); if (denied) return denied;
   const x = await body(request); if (!x.subject || !x.chapter || !x.prompt) return json({ error: 'بيانات السؤال غير مكتملة' }, 400);
-  const [sid,cid] = await ids(env,x);
-  await env.DB.prepare('UPDATE questions SET subject_id=?,chapter_id=?,type=?,prompt=?,options_json=?,correct_answer=?,explanation=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(sid,cid,x.type,x.prompt.trim(),JSON.stringify(x.options||[]),x.correct_answer||null,x.explanation||null,params.id).run();
+  const [sid,cid] = await ids(env,x); const difficulty = ['easy','medium','hard'].includes(x.difficulty) ? x.difficulty : 'medium';
+  await env.DB.prepare('UPDATE questions SET subject_id=?,chapter_id=?,type=?,prompt=?,options_json=?,correct_answer=?,explanation=?,difficulty=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(sid,cid,x.type,x.prompt.trim(),JSON.stringify(x.options||[]),x.correct_answer||null,x.explanation||null,difficulty,params.id).run();
   return json({ ok: true, id: params.id });
 }
 export async function onRequestDelete({ request, env, params }) {
