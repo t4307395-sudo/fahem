@@ -1,0 +1,12 @@
+name = "exam-review-pwa"
+compatibility_date = "2026-08-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "exam_review_db"
+database_id = "ضع-معرف-قاعدة-D1-هنا"
+
+[vars]
+# غيّرها إلى قيمة عشوائية طويلة في إعدادات Pages، ولا تضعها في المستودع العام.
+SESSION_SECRET = "change-this-in-cloudflare-dashboard"
