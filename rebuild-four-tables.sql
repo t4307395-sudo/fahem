@@ -1,5 +1,5 @@
--- Fahem production schema: four application tables.
--- Questions and answer choices are stored together. Student history and support messages are JSON-backed.
+-- Planned rebuild for mu50. Apply only after the verified backup.
+-- Final application tables: users, questions, attempts, messages.
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
