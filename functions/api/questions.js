@@ -1,7 +1,7 @@
-import { json, body, me, requireTeacher } from './_shared.js';
+import { json, body, me, requireTeacher, optionsJson } from './_shared.js';
 export async function onRequestGet({ env }) {
   const rows = await env.DB.prepare('SELECT q.*,s.name subject,c.name chapter FROM questions q JOIN subjects s ON s.id=q.subject_id JOIN chapters c ON c.id=q.chapter_id ORDER BY q.id DESC').all();
-  return json({ questions: (rows.results || []).map(q => ({ ...q, options: JSON.parse(q.options_json || '[]') })) });
+  return json({ questions: (rows.results || []).map(q => ({ ...q, options: optionsJson(q.options_json) })) });
 }
 export async function onRequestPost({ request, env }) {
   const denied = requireTeacher(await me(request, env)); if (denied) return denied;

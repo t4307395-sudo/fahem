@@ -29,4 +29,27 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('replace(/[&<>');
     expect(app).toContain('esc(q.prompt)');
   });
+
+  it('keeps account and support tools inside the app shell', () => {
+    expect(app).toContain("go('profile')");
+    expect(app).toContain("go('contact')");
+    expect(app).toContain('fahem_contact_drafts');
+  });
+
+  it('supports an in-app PWA install flow', () => {
+    expect(html).toContain('/manifest.json');
+    expect(app).toContain('beforeinstallprompt');
+    expect(app).toContain("navigator.serviceWorker.register('/sw.js')");
+    expect(app).toContain('installApp()');
+  });
+
+  it('does not expose teacher wording in the student login copy', () => {
+    expect(app).not.toContain('كلمة المرور للمعلم فقط');
+    expect(app).not.toContain('المعلم يستخدم كلمة المرور');
+  });
+
+  it('requires a material for full-book review', () => {
+    expect(app).toContain("optionSelect('bookSubject','المادة',subjects)");
+    expect(app).toContain("document.querySelector('#bookSubject')");
+  });
 });
