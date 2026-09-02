@@ -17,6 +17,15 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('function beginTraining(kind)');
   });
 
+  it('supports the open test year and subject filters', () => {
+    expect(app).toContain('function yearSelect(id,years)');
+    expect(app).toContain("document.querySelector('#quizYear')");
+    expect(app).toContain("optionSelect('quizSubject','المادة',subjects,'كل المواد')");
+    expect(app).toContain("filteredPool(subject,'',difficulty,limit,schoolYear)");
+    expect(app).toContain('اختر السنة الدراسية أولًا');
+    expect(app).toContain('الاختبار المفتوح');
+  });
+
   it('supports configurable exam and explanation feedback', () => {
     expect(app).toContain('examLimit');
     expect(app).toContain('examMinutes');
