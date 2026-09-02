@@ -12,6 +12,7 @@ CREATE INDEX IF NOT EXISTS idx_questions_subject_chapter ON questions(subject_id
 CREATE INDEX IF NOT EXISTS idx_attempts_student ON attempts(student_id,completed_at);
 CREATE INDEX IF NOT EXISTS idx_answers_question ON attempt_answers(question_id);
 CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY,value TEXT NOT NULL,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS contact_messages (id INTEGER PRIMARY KEY AUTOINCREMENT,sender_email TEXT NOT NULL,sender_name TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'new' CHECK(status IN ('new','read','closed')),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS student_favorites (student_id INTEGER NOT NULL,question_id INTEGER NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(student_id,question_id),FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE);
 CREATE INDEX IF NOT EXISTS idx_favorites_student ON student_favorites(student_id,created_at);
 INSERT OR IGNORE INTO app_settings(key,value) VALUES ('exam_duration_seconds','900');

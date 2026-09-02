@@ -33,7 +33,8 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   it('keeps account and support tools inside the app shell', () => {
     expect(app).toContain("go('profile')");
     expect(app).toContain("go('contact')");
-    expect(app).toContain('fahem_contact_drafts');
+    expect(app).toContain("api('/contact'");
+    expect(app).toContain('تم إرسال رسالتك بنجاح');
   });
 
   it('supports an in-app PWA install flow', () => {
