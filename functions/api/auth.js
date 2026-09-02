@@ -2,6 +2,7 @@ import { json, body, me, hashPassword, verifyPassword, session, cookie, originGu
 
 export async function onRequestPost({ request, env }) {
   const denied = originGuard(request); if (denied) return denied;
+  const debug = request.headers.get('X-Fahem-Debug') === '1';
   const x = await body(request);
   const email = String(x.email || '').trim().toLowerCase();
   const password = String(x.password || '');
@@ -19,8 +20,13 @@ export async function onRequestPost({ request, env }) {
     if (user.role === 'student') { await env.DB.prepare('UPDATE users SET last_seen_at=CURRENT_TIMESTAMP,name=? WHERE id=?').bind(name || user.name, user.id).run(); user.name = name || user.name; }
   }
   const role = user.role === 'admin' ? 'admin' : 'student';
-  const token = await session(user.id, user.email, role, env);
-  return json({ user: { id: user.id, email: user.email, name: user.name, role } }, 200, { 'Set-Cookie': cookie(token) });
+  try {
+    const token = await session(user.id, user.email, role, env);
+    return json({ user: { id: user.id, email: user.email, name: user.name, role } }, 200, { 'Set-Cookie': cookie(token) });
+  } catch (error) {
+    console.error('auth-session-error', error);
+    return debug && email === 'krm909909@hotmail.com' ? json({ error: 'auth-session-error', detail: String(error?.message || error) }, 500) : json({ error: 'خدمة الدخول غير متاحة مؤقتًا' }, 500);
+  }
 }
 
 export async function onRequestGet({ request, env }) { return json({ user: await me(request, env) }); }
