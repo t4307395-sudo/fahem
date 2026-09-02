@@ -4,5 +4,5 @@ pages_build_output_dir = "."
 
 [[d1_databases]]
 binding = "DB"
-database_name = "exam_review_db"
+database_name = "mu50"
 database_id = "a25e889a-d99f-4c33-ba1a-5ce8bf750748"
