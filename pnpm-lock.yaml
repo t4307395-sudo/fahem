@@ -12,6 +12,9 @@ importers:
         specifier: ^0.18.5
         version: 0.18.5
     devDependencies:
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       vitest:
         specifier: ^3.2.4
         version: 3.2.7

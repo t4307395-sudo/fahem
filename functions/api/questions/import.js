@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from './xlsx-bundle.js';
 import { json, me, requireTeacher, limitText, originGuard } from '../_shared.js';
 
 const TYPES = new Set(['mcq', 'boolean', 'essay']);
