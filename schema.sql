@@ -13,8 +13,9 @@ CREATE INDEX IF NOT EXISTS idx_attempts_student ON attempts(student_id,completed
 CREATE INDEX IF NOT EXISTS idx_answers_question ON attempt_answers(question_id);
 CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY,value TEXT NOT NULL,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS contact_messages (id INTEGER PRIMARY KEY AUTOINCREMENT,sender_email TEXT NOT NULL,sender_name TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'new' CHECK(status IN ('new','read','closed')),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS login_rate_limits (key TEXT PRIMARY KEY,window_start INTEGER NOT NULL,attempts INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS student_favorites (student_id INTEGER NOT NULL,question_id INTEGER NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(student_id,question_id),FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE);
 CREATE INDEX IF NOT EXISTS idx_favorites_student ON student_favorites(student_id,created_at);
 INSERT OR IGNORE INTO app_settings(key,value) VALUES ('exam_duration_seconds','900');
--- حساب المعلم الأولي: غيّر كلمة المرور بعد التنفيذ. password_hash يجب أن يكون SHA-256 hex.
+-- حساب المعلم الأولي: غيّر كلمة المرور بعد التنفيذ. password_hash يستخدم PBKDF2 بصيغة pbkdf2$iterations$salt$hash.
 -- INSERT INTO teachers(email,password_hash,name) VALUES ('teacher@gmail.com','ضع_هاش_كلمة_المرور','المعلم');
