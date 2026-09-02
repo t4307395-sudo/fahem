@@ -21,7 +21,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('function yearSelect(id,years)');
     expect(app).toContain("document.querySelector('#quizYear')");
     expect(app).toContain("optionSelect('quizSubject','المادة',subjects,'كل المواد')");
-    expect(app).toContain("filteredPool(subject,'',difficulty,limit,schoolYear)");
+    expect(app).toContain("filteredPool(subject,'',difficulty,limit,schoolYear,50)");
     expect(app).toContain('اختر السنة الدراسية أولًا');
     expect(app).toContain('الاختبار المفتوح');
   });
@@ -61,5 +61,16 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   it('requires a material for full-book review', () => {
     expect(app).toContain("optionSelect('bookSubject','المادة',subjects)");
     expect(app).toContain("document.querySelector('#bookSubject')");
+  });
+  it('uses fixed student-safe question count selectors and caps study modes', () => {
+    expect(app).toContain("countSelect('trainLimit','عدد الأسئلة',50");
+    expect(app).toContain("countSelect('quizLimit','عدد الأسئلة',50");
+    expect(app).toContain("countSelect('examLimit','عدد الأسئلة',100");
+    expect(app).toContain("filteredPool(subject,chapter,difficulty,limit,'',50)");
+    expect(app).toContain("filteredPool(subject,'',difficulty,limit,'',100)");
+  });
+  it('shows administration navigation only to the admin account', () => {
+    expect(app).toContain("state.user?.role==='admin'");
+    expect(app).toContain('>الإدارة</button>');
   });
 });
