@@ -7,7 +7,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
     expect(html).toContain('<html lang="ar" dir="rtl">');
-    expect(html).toContain('app.js?rev=fahem-upgrade-20260902');
+    expect(html).toContain('app.js?rev=fahem-identity-20260903');
   });
 
   it('exposes the three requested study modes', () => {
