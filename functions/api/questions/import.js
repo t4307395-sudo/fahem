@@ -13,7 +13,7 @@ function normalizeRow(raw, rowNumber) {
   const row = Object.fromEntries(Object.entries(raw).map(([k, v]) => [String(k).trim().toLowerCase(), v]));
   const type = clean(row.type, 20).toLowerCase();
   const difficulty = clean(row.difficulty, 20).toLowerCase();
-  const options = [row.option_a, row.option_b, row.option_c, row.option_d]
+  const options = (Array.isArray(row.options) ? row.options : [row.option_a, row.option_b, row.option_c, row.option_d])
     .map(v => clean(v, 1000)).filter(Boolean);
   const item = {
     row: rowNumber,
