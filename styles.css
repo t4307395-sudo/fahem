@@ -55,3 +55,18 @@ html.dark{--ink:#e8f6f1;--muted:#9dbab6;--paper:#0c1b22;--card:#142832;--line:#2
   .exam-mode .quiz-footer{padding:16px 0}
   .exam-mode .quiz-footer .btn{width:100%}
 }
+
+/* Mobile header: keep the content clear and leave secondary actions in the main nav. */
+@media(max-width:520px){
+  .topbar{position:relative;min-height:64px;height:auto;padding:8px 12px;gap:8px}
+  .brand{font-size:18px;gap:6px;flex-shrink:0}
+  .brand small{display:none}
+  .brand-mark{width:34px;height:34px;font-size:20px;border-radius:11px 11px 11px 3px}
+  .top-actions{gap:5px;flex:1;min-width:0;justify-content:flex-end;flex-wrap:nowrap}
+  .top-actions .ghost,.top-actions .user-chip{display:none}
+  .top-actions .icon-btn{padding:5px 7px;font-size:0;white-space:nowrap}
+  .top-actions .icon-btn:first-letter{font-size:18px}
+  .top-actions .btn.secondary{padding:6px 9px;font-size:11px;white-space:nowrap}
+  .nav{margin-top:4px}
+  .exam-mode .timer{top:8px}
+}
