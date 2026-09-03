@@ -115,11 +115,13 @@ document.addEventListener('click', event => {
   if (!match) return;
   const fn = window[match[1]];
   if (typeof fn !== 'function') return;
+  const splitActionArgs = value => { const args=[]; let start=0,depth=0,quote=''; for(let i=0;i<value.length;i++){const ch=value[i]; if(quote){if(ch===quote&&value[i-1]!=='\\')quote=''; continue} if(ch==="'"||ch==='"'){quote=ch;continue} if(ch==='('){depth++;continue} if(ch===')'){depth--;continue} if(ch===','&&depth===0){args.push(value.slice(start,i).trim());start=i+1}} args.push(value.slice(start).trim()); return args.filter(Boolean) };
   const args = match[2].trim()
-    ? match[2].split(',').map(value => {
+    ? splitActionArgs(match[2]).map(value => {
         const v = value.trim();
         if (v === 'null') return null;
-        if ((v.startsWith("'") && v.endsWith("'")) || (v.startsWith('\\"') && v.endsWith('\\"'))) return v.slice(1, -1);
+        if ((v.startsWith("'") && v.endsWith("'")) || (v.startsWith('\"') && v.endsWith('\"'))) return v.slice(1, -1);
+        if (/^(Math\.max|Math\.min)\([^)]*\)$/.test(v)) { try { const resolved=v.replace(/state\.questions\.length/g,String(state.questions.length)).replace(/state\.currentQuestionIndex/g,String(state.currentQuestionIndex)); return Function(`"use strict";return (${resolved})`)(); } catch { return 0; } }
         const n = Number(v);
         return Number.isNaN(n) ? v : n;
       })
