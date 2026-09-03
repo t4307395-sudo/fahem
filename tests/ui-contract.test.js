@@ -7,7 +7,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
     expect(html).toContain('<html lang="ar" dir="rtl">');
-    expect(html).toContain('app.js?rev=fahem-training-buttons-20260903');
+    expect(html).toContain('app.js?rev=fahem-navigation-20260904');
   });
 
   it('exposes the three requested study modes', () => {
@@ -82,6 +82,11 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('state.results[id]');
     expect(app).toContain('splitActionArgs');
     expect(app).toContain('canNext=Boolean');
+  });
+  it('provides previous and next navigation in both study modes', () => {
+    expect(app).toContain('class="question-navigation"');
+    expect(app).toContain("state.mode==='training'||state.mode==='exam'");
+    expect(app).toContain("اختر إجابة للمتابعة");
   });
   it('includes search and social sharing metadata', () => {
     expect(html).toContain('rel="canonical"');
