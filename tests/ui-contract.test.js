@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
 
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
@@ -87,6 +88,9 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('class="question-navigation"');
     expect(app).toContain("state.mode==='training'||state.mode==='exam'");
     expect(app).toContain("اختر إجابة للمتابعة");
+  });
+  it('keeps the long exam question index available while scrolling', () => {
+    expect(styles).toContain('.exam-mode .question-index{position:sticky');
   });
   it('includes search and social sharing metadata', () => {
     expect(html).toContain('rel="canonical"');
