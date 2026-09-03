@@ -81,4 +81,10 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('data-question-index="${i}"');
     expect(app).toContain('state.results[id]');
   });
+  it('includes search and social sharing metadata', () => {
+    expect(html).toContain('rel="canonical"');
+    expect(html).toContain('property="og:title"');
+    expect(html).toContain('/assets/og-image.png');
+    expect(html).toContain('EducationalApplication');
+  });
 });
