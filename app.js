@@ -71,8 +71,6 @@ async function admin(){
       <section id="admin-operations" class="admin-section"><div class="admin-section-head"><div><h2>التشغيل والدعم</h2><p class="muted">المقالات والبلاغات ورسائل الطلاب في مكان واحد.</p></div></div><div class="admin-two-col"><section class="card admin-panel"><h2>إجابات مقالية</h2><p class="muted">${(essays?.essays||[]).length} إجابات معلقة تحتاج مراجعة.</p><button class="btn secondary" data-action="scroll-essay">فتح قائمة المراجعة</button></section><section class="card admin-panel"><h2>رسائل وبلاغات جديدة</h2><p class="muted">${(messages?.messages||[]).length} رسالة محفوظة في النظام، منها ${c.new_messages||0} جديدة.</p><button class="btn secondary" data-action="scroll-support">فتح الرسائل</button></section></div><section class="card admin-panel" id="essayQueue"><h2>إجابات مقالية تحتاج مراجعة</h2>${(essays?.essays||[]).length?(essays.essays.map(e=>`<article class="essay-review"><strong>${esc(e.student_name)}</strong><p>${esc(e.prompt)}</p><blockquote>${esc(e.answer_text||'—')}</blockquote><div class="inline-fields"><input id="essay-score-${e.id}" type="number" min="0" max="100" placeholder="الدرجة من 100"><textarea id="essay-feedback-${e.id}" placeholder="ملاحظات الإدارة"></textarea></div><button class="btn small" data-action="reviewEssay(${e.id})">حفظ التقييم</button></article>`).join('')):'<div class="empty-state inline"><strong>لا توجد إجابات معلقة</strong><span>ستظهر هنا بعد إرسال الطلاب.</span></div>'}</section><section class="card admin-panel" id="supportMessages"><h2>رسائل الدعم والبلاغات</h2>${(messages?.messages||[]).length?(messages.messages.map(m=>`<article class="essay-review"><strong>${esc(m.sender_name)} · ${esc(m.sender_email)}</strong><small>${esc(m.created_at||'')}</small><blockquote>${esc((()=>{try{return JSON.parse(m.payload_json||'{}').message||m.payload_json}catch{return m.payload_json||'—'}})())}</blockquote></article>`).join('')):'<div class="empty-state inline"><strong>لا توجد رسائل</strong><span>ستظهر هنا رسائل الطلاب وبلاغاتهم.</span></div>'}</section></section>
       <section id="admin-settings" class="admin-section"><div class="admin-section-head"><div><h2>إعدادات المنصة والامتحان</h2><p class="muted">ضبط القواعد العامة للتجربة التعليمية.</p></div></div><div class="admin-two-col"><section class="card admin-panel"><h2>مدة الامتحان الافتراضية</h2><p class="muted">تُستخدم عند إنشاء الامتحانات الجديدة.</p><div class="inline-fields"><label>الدقائق<input id="examMinutes" type="number" min="1" max="120" value="${Math.round((Number(setting?.seconds)||900)/60)}"></label><button class="btn" data-action="saveExamSettings()">حفظ الإعداد</button></div></section><section class="card admin-panel"><h2>حالة المنصة</h2><div class="setting-row"><span>التسجيل للطلاب</span><span class="status-live">● مفتوح</span></div><div class="setting-row"><span>حساب الإدارة</span><span class="pill">كرم · Admin</span></div><div class="setting-row"><span>قاعدة الأسئلة</span><span>${c.questions||0} سؤال</span></div></section></div></section>
     </main></section>`);
-  document.querySelector('[data-action="scroll-essay"]')?.addEventListener('click',()=>document.querySelector('#essayQueue')?.scrollIntoView({behavior:'smooth'}));
-  document.querySelector('[data-action="scroll-support"]')?.addEventListener('click',()=>document.querySelector('#supportMessages')?.scrollIntoView({behavior:'smooth'}));
 }
 function adminTab(tab){document.querySelectorAll('.admin-section').forEach(x=>x.classList.toggle('is-hidden',x.id!==`admin-${tab}`));document.querySelectorAll('.admin-nav').forEach(x=>x.classList.toggle('active',x.getAttribute('data-action')===`adminTab('${tab}')`));document.querySelector(`#admin-${tab}`)?.scrollIntoView({behavior:'smooth',block:'start'})}
 async function previewImport(){const input=document.querySelector('#questionsExcel'),file=input?.files?.[0],box=document.querySelector('#importPreview');if(!file)return toast('اختر ملف Excel أولًا');if(box)box.innerHTML='<div class="import-loading">جارٍ فحص الملف...</div>';const form=new FormData();form.append('file',file);try{const r=await fetch('/api/questions/import',{method:'POST',body:form,credentials:'same-origin'}),data=await r.json().catch(()=>({}));if(!r.ok||!data.ok)return box.innerHTML=`<div class="feedback bad"><strong>${esc(data.error||'تعذر قراءة الملف')}</strong>${data.errors?.length?`<span>${data.errors.slice(0,8).map(e=>`صف ${e.row}: ${esc(e.errors.join('، '))}`).join('<br>')}</span>`:''}</div>`;state.importRows=data.rows||[];const errors=data.errors||[];box.innerHTML=`<div class="import-summary"><strong>${state.importRows.length} سؤال صالح</strong><span>${errors.length?`${errors.length} صف به أخطاء`:'لا توجد أخطاء'}</span>${errors.length?`<details><summary>عرض الأخطاء</summary><p>${errors.slice(0,15).map(e=>`صف ${e.row}: ${esc(e.errors.join('، '))}`).join('<br>')}</p></details>`:''}${state.importRows.length?`<div class="import-preview-list">${state.importRows.slice(0,5).map(q=>`<div><b>${esc(q.subject)}</b> · ${esc(q.prompt)}</div>`).join('')}</div><button class="btn" data-action="commitImport()">استيراد ${state.importRows.length} سؤال ←</button>`:''}</div>`}catch(_){if(box)box.innerHTML='<div class="feedback bad"><strong>تعذر الاتصال بالخادم</strong></div>'}}
@@ -105,8 +103,8 @@ document.addEventListener('click', event => {
   const target = event.target.closest('[data-action]');
   if (!target) return;
   const action = target.getAttribute('data-action') || '';
-  if (action === 'scroll-essay') {
-    document.querySelector('#essayQueue')?.scrollIntoView({ behavior: 'smooth' });
+  if (action === 'scroll-essay' || action === 'scroll-support') {
+    document.querySelector(action === 'scroll-essay' ? '#essayQueue' : '#supportMessages')?.scrollIntoView({ behavior: 'smooth' });
     return;
   }
   if (action === 'close-editor') {
@@ -126,7 +124,16 @@ document.addEventListener('click', event => {
         return Number.isNaN(n) ? v : n;
       })
     : [];
-  fn(...args);
+  if (target.dataset.busy === 'true') return;
+  target.dataset.busy = 'true';
+  target.setAttribute('aria-busy', 'true');
+  event.preventDefault();
+  Promise.resolve(fn(...args)).finally(() => {
+    if (target.isConnected) {
+      target.dataset.busy = 'false';
+      target.removeAttribute('aria-busy');
+    }
+  });
   if (action.includes('return false')) event.preventDefault();
 });
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();state.installPrompt=event;const btn=document.querySelector('#installBtn');if(btn)btn.hidden=false});window.addEventListener('appinstalled',()=>{state.installPrompt=null});if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});boot();
