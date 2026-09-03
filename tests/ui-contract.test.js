@@ -7,7 +7,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
     expect(html).toContain('<html lang="ar" dir="rtl">');
-    expect(html).toContain('app.js?rev=fahem-identity-20260903');
+    expect(html).toContain('app.js?rev=fahem-question-index-20260903');
   });
 
   it('exposes the three requested study modes', () => {
@@ -72,5 +72,13 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   it('shows administration navigation only to the admin account', () => {
     expect(app).toContain("state.user?.role==='admin'");
     expect(app).toContain('>الإدارة</button>');
+  });
+  it('provides a clickable question index and result review navigation', () => {
+    expect(app).toContain('function questionIndex()');
+    expect(app).toContain('function jumpToQuestion(index)');
+    expect(app).toContain('function resultIndex()');
+    expect(app).toContain('function reviewResultQuestion(index)');
+    expect(app).toContain('data-question-index="${i}"');
+    expect(app).toContain('state.results[id]');
   });
 });
