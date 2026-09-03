@@ -36,3 +36,22 @@ html.dark{--ink:#e8f6f1;--muted:#9dbab6;--paper:#0c1b22;--card:#142832;--line:#2
 .exam-mode .question-index{position:sticky;top:88px;z-index:4}
 .exam-mode .question-index .index-dots{max-height:78px;overflow:auto}
 @media(max-width:520px){.exam-mode .question-index{top:78px}.exam-mode .question-index .index-dots{max-height:64px}}
+
+/* Mobile exam UX: compact sticky index, single-row scrolling dots, and tighter cards. */
+@media(max-width:520px){
+  .exam-mode .question-index{top:76px;padding:8px 10px;margin-bottom:10px;border-radius:14px}
+  .exam-mode .question-index .index-head{margin-bottom:5px}
+  .exam-mode .question-index .index-head .muted{display:none}
+  .exam-mode .question-index .index-dots{flex-wrap:nowrap;overflow-x:auto;max-height:none;gap:6px;padding-bottom:2px;scrollbar-width:none}
+  .exam-mode .question-index .index-dots::-webkit-scrollbar{display:none}
+  .exam-mode .question-index .question-dot{flex:0 0 28px;width:28px;height:28px;font-size:11px}
+  .exam-mode .question-index .index-legend{display:none}
+  .exam-mode .quiz-head{padding:14px 16px;margin:12px 0 14px}
+  .exam-mode .quiz-head h1{font-size:24px}
+  .exam-mode .quiz-head .pill{font-size:11px}
+  .exam-mode .question-card{padding:22px 0}
+  .exam-mode .question-card h2{font-size:18px;line-height:1.55}
+  .exam-mode .question-card .option{padding:12px;font-size:14px}
+  .exam-mode .quiz-footer{padding:16px 0}
+  .exam-mode .quiz-footer .btn{width:100%}
+}
