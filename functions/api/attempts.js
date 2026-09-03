@@ -5,7 +5,8 @@ export async function onRequestPost({ request, env }) {
   const originDenied = originGuard(request); if (originDenied) return originDenied;
   const x = await body(request);
   const mode = ['practice','mock','mistakes'].includes(x.mode) ? x.mode : null;
-  if (!mode || !Array.isArray(x.question_ids) || x.question_ids.length > 200 || !x.answers || typeof x.answers !== 'object') return json({ error: 'بيانات المحاولة غير صالحة' }, 400);
+  const maxQuestions = mode === 'mock' ? 100 : 50;
+  if (!mode || !Array.isArray(x.question_ids) || x.question_ids.length > maxQuestions || !x.answers || typeof x.answers !== 'object') return json({ error: 'بيانات المحاولة غير صالحة' }, 400);
   const ids = [...new Set(x.question_ids.map(Number).filter(Number.isInteger).filter(id => id > 0))];
   if (!ids.length) return json({ error: 'لم يتم اختيار أسئلة' }, 400);
   const placeholders = ids.map(() => '?').join(',');
