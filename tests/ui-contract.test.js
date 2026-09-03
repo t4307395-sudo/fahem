@@ -80,6 +80,8 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     expect(app).toContain('function reviewResultQuestion(index)');
     expect(app).toContain('data-question-index="${i}"');
     expect(app).toContain('state.results[id]');
+    expect(app).toContain('splitActionArgs');
+    expect(app).toContain('canNext=Boolean');
   });
   it('includes search and social sharing metadata', () => {
     expect(html).toContain('rel="canonical"');
