@@ -9,6 +9,7 @@ CREATE TABLE users (
   password_hash TEXT NOT NULL DEFAULT '',
   phone TEXT,
   school_year TEXT,
+  educational_stage TEXT,
   subjects_json TEXT NOT NULL DEFAULT '[]',
   stats_json TEXT NOT NULL DEFAULT '{}',
   settings_json TEXT NOT NULL DEFAULT '{}',
@@ -28,6 +29,9 @@ CREATE TABLE questions (
   correct_answer TEXT,
   explanation TEXT,
   difficulty TEXT NOT NULL DEFAULT 'medium' CHECK(difficulty IN ('easy','medium','hard')),
+  unit TEXT NOT NULL DEFAULT 'الوحدة الأولى',
+  educational_stage TEXT,
+  is_published INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT
 );
