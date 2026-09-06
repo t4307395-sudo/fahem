@@ -99,3 +99,63 @@ const styles = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
     expect(html).toContain('EducationalApplication');
   });
 });
+
+
+describe('Fahem curriculum-first student experience', () => {
+  it('collects the student educational stage and school year at login', () => {
+    expect(app).toContain('educationalStage');
+    expect(app).toContain('schoolYear');
+    expect(app).toContain('educational_stage');
+    expect(app).toContain('school_year');
+  });
+  it('provides the curriculum hierarchy and lesson/unit test actions', () => {
+    expect(app).toContain('function curriculum()');
+    expect(app).toContain('startLessonTest');
+    expect(app).toContain('startUnitTest');
+    expect(app).toContain('اختباراتي');
+    expect(app).toContain('اختبار الوحدة');
+  });
+  it('supports curriculum fields in the server schema and question API', () => {
+    expect(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8')).toContain('educational_stage TEXT');
+    expect(readFileSync(new URL('../schema.sql', import.meta.url), 'utf8')).toContain('unit TEXT');
+    expect(readFileSync(new URL('../functions/api/questions.js', import.meta.url), 'utf8')).toContain('needsCurriculum');
+  });
+});
+
+
+describe('Fahem curriculum access boundary', () => {
+  it('keeps curriculum navigation as the primary student route', () => {
+    expect(app).toContain("data-action=\"go('curriculum')\"");
+    expect(app).not.toContain('أنشئ امتحانًا</button>');
+    expect(app).not.toContain('اختبار مفتوح');
+  });
+  it('stores and enforces assessment scope on the server', () => {
+    const attempts = readFileSync(new URL('../functions/api/attempts.js', import.meta.url), 'utf8');
+    expect(attempts).toContain('scope_type');
+    expect(attempts).toContain('خارج منهجك الدراسي');
+  });
+});
+
+
+describe('Schoolbook content administration', () => {
+  it('exposes the administrator content manager and all curriculum node types', () => {
+    expect(app).toContain('function contentManager()');
+    expect(app).toContain('createContentNode');
+    expect(app).toContain('createContentAssessment');
+    expect(app).toContain('linkAssessmentQuestion');
+    expect(app).toContain('stage');
+    expect(app).toContain('year');
+    expect(app).toContain('subject');
+    expect(app).toContain('unit');
+    expect(app).toContain('lesson');
+  });
+  it('provides a protected content API with publish and assessment controls', () => {
+    const contentApi = readFileSync(new URL('../functions/api/content.js', import.meta.url), 'utf8');
+    const migration = readFileSync(new URL('../migrations/phase8_schoolbook_content.sql', import.meta.url), 'utf8');
+    expect(contentApi).toContain('هذه العملية متاحة للإدارة فقط');
+    expect(contentApi).toContain('assessment-question');
+    expect(migration).toContain('content_nodes');
+    expect(migration).toContain('content_assessments');
+    expect(migration).toContain('assessment_questions');
+  });
+});
