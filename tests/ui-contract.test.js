@@ -6,6 +6,7 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
 const shared = readFileSync(new URL('../functions/api/_shared.js', import.meta.url), 'utf8');
 const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+const authMe = readFileSync(new URL('../functions/api/auth/me.js', import.meta.url), 'utf8');
 
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
@@ -111,5 +112,9 @@ const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
     expect(sw).toContain("CACHE='fahem-v6-20260906'");
     expect(sw).toContain('self.skipWaiting()');
     expect(sw).toContain('ignoreSearch:true');
+  });
+  it('keeps the student curriculum profile after session refresh', () => {
+    expect(authMe).toContain('educational_stage,school_year');
+    expect(authMe).toContain('school_year: current.school_year || null');
   });
 });
