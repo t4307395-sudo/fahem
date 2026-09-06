@@ -26,4 +26,22 @@ export function requireTeacher(user) { return !user || !['admin','teacher'].incl
 export async function studentId(user, env) { const email=String(user?.email||'').trim().toLowerCase(); return email && user.role === 'student' ? (await env.DB.prepare('SELECT id FROM users WHERE lower(email)=? AND role=\'student\'').bind(email).first())?.id : null; }
 export function originGuard(request) { const origin = request.headers.get('Origin'); const host = request.headers.get('Host'); if (origin && host && new URL(origin).host !== host) return json({ error: 'طلب غير صالح' }, 403); return null; }
 export function limitText(value, max = 10000) { const text = String(value ?? '').trim(); return text.length > max ? text.slice(0, max) : text; }
-export async function loginRateAllowed(_request, _env, _email) { return true; }
+export async function loginRateAllowed(request, env, email) {
+  try {
+    await env.DB.prepare('CREATE TABLE IF NOT EXISTS login_rate_limits (key TEXT PRIMARY KEY,window_start INTEGER NOT NULL,attempts INTEGER NOT NULL DEFAULT 0)').run();
+    const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
+    const key = await sha(`${String(email).toLowerCase()}|${ip}`).then(value => value.slice(0, 64));
+    const now = Math.floor(Date.now() / 1000); const windowSeconds = 60; const maxAttempts = 5;
+    const row = await env.DB.prepare('SELECT window_start,attempts FROM login_rate_limits WHERE key=?').bind(key).first();
+    if (!row || now - Number(row.window_start) >= windowSeconds) {
+      await env.DB.prepare('INSERT INTO login_rate_limits(key,window_start,attempts) VALUES(?,?,1) ON CONFLICT(key) DO UPDATE SET window_start=excluded.window_start,attempts=1').bind(key, now).run();
+      return true;
+    }
+    if (Number(row.attempts) >= maxAttempts) return false;
+    await env.DB.prepare('UPDATE login_rate_limits SET attempts=attempts+1 WHERE key=?').bind(key).run();
+    return true;
+  } catch (error) {
+    console.error('login-rate-limit-error', error);
+    return true;
+  }
+}

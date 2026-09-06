@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const styles = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+const shared = readFileSync(new URL('../functions/api/_shared.js', import.meta.url), 'utf8');
+const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 
  describe('Fahem student experience contract', () => {
   it('keeps an Arabic RTL document and cache-busted app entry', () => {
@@ -97,5 +99,17 @@ const styles = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
     expect(html).toContain('property="og:title"');
     expect(html).toContain('/assets/og-image.png');
     expect(html).toContain('EducationalApplication');
+  });
+  it('keeps login abuse protection enabled and self-healing', () => {
+    expect(shared).toContain('CREATE TABLE IF NOT EXISTS login_rate_limits');
+    expect(shared).toContain('maxAttempts = 5');
+    expect(shared).toContain('return false');
+    expect(shared).not.toContain('loginRateAllowed(_request, _env, _email) { return true; }');
+  });
+  it('declares the app icon and refreshes stale PWA assets', () => {
+    expect(html).toContain('rel="icon"');
+    expect(sw).toContain("CACHE='fahem-v6-20260906'");
+    expect(sw).toContain('self.skipWaiting()');
+    expect(sw).toContain('ignoreSearch:true');
   });
 });
