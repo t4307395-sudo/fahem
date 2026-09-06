@@ -17,8 +17,9 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   const denied=requireTeacher(await me(request,env)); if(denied)return denied; const od=originGuard(request);if(od)return od; const x=await body(request);
   const subject=limitText(x.subject,160), lesson=limitText(x.chapter||x.lesson,160), prompt=limitText(x.prompt,20000); if(!subject||!lesson||!prompt||!['mcq','boolean','essay'].includes(x.type))return json({error:'بيانات السؤال غير مكتملة'},400);
-  const options=Array.isArray(x.options)?x.options.map(v=>limitText(v,1000)).filter(Boolean).slice(0,10):[]; const difficulty=['easy','medium','hard'].includes(x.difficulty)?x.difficulty:'medium';
-  const q=await env.DB.prepare('INSERT INTO questions(subject,lesson,school_year,educational_stage,type,prompt,options_json,correct_answer,explanation,difficulty,is_published) VALUES(?,?,?,?,?,?,?,?,?,?,?) RETURNING id').bind(subject,lesson,limitText(x.school_year,100)||null,limitText(x.educational_stage,80)||null,x.type,prompt,JSON.stringify(options),limitText(x.correct_answer,1000)||null,limitText(x.explanation,20000)||null,difficulty,x.is_published===false?0:1).first(); return json({id:q.id});
+  const options=Array.isArray(x.options)?x.options.map(v=>limitText(v,1000)).filter(Boolean).slice(0,10):[]; const difficulty=['easy','medium','hard'].includes(x.difficulty)?x.difficulty:'medium'; const correct_answer=limitText(x.correct_answer,1000)||null;
+  if(x.type!=='essay'&&(!correct_answer||!options.includes(correct_answer)))return json({error:'الإجابة الصحيحة يجب أن تطابق أحد الاختيارات حرفيًا'},400);
+  const q=await env.DB.prepare('INSERT INTO questions(subject,lesson,school_year,educational_stage,type,prompt,options_json,correct_answer,explanation,difficulty,is_published) VALUES(?,?,?,?,?,?,?,?,?,?,?) RETURNING id').bind(subject,lesson,limitText(x.school_year,100)||null,limitText(x.educational_stage,80)||null,x.type,prompt,JSON.stringify(options),correct_answer,limitText(x.explanation,20000)||null,difficulty,x.is_published===false?0:1).first(); return json({id:q.id});
 }
 
 export async function onRequestPut({request,env}) { return json({error:'استخدم مسار السؤال المحدد'},405); }

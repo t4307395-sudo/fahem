@@ -15,7 +15,7 @@ export async function onRequestPost({ request, env }) {
       if (checked.needsUpgrade) { const upgraded = await hashPassword(password); await env.DB.prepare('UPDATE users SET password_hash=? WHERE id=?').bind(upgraded, user.id).run(); user.password_hash = upgraded; }
       if (user.role === 'student') { if (!name || !educational_stage || !school_year) return json({ error: 'أكمل الاسم والمرحلة والسنة الدراسية' }, 400); await env.DB.prepare('UPDATE users SET last_seen_at=CURRENT_TIMESTAMP,name=?,educational_stage=?,school_year=? WHERE id=?').bind(name, educational_stage, school_year, user.id).run(); user.name = name; user.educational_stage = educational_stage; user.school_year = school_year; }
     }
-    const role = user.role === 'admin' ? 'admin' : 'student'; const token = await session(user.id, user.email, role, env);
+    const role = ['admin','teacher'].includes(user.role) ? user.role : 'student'; const token = await session(user.id, user.email, role, env);
     return json({ user: { id: user.id, email: user.email, name: user.name, role, educational_stage: user.educational_stage || null, school_year: user.school_year || null } }, 200, { 'Set-Cookie': cookie(token) });
   } catch (error) {
     console.error('auth-runtime-error', error);

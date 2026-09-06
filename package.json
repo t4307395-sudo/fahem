@@ -9,8 +9,5 @@
   "devDependencies": {
     "esbuild": "^0.28.2",
     "vitest": "^3.2.4"
-  },
-  "dependencies": {
-    "xlsx": "^0.18.5"
   }
 }

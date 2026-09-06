@@ -10,5 +10,9 @@ export async function onRequest(context) {
   const response = await context.next();
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(securityHeaders)) headers.set(key, value);
+  // Cookie-based sessions are same-origin only; strip any wildcard CORS header
+  // (platform default or otherwise) so responses can't be read cross-origin.
+  headers.delete('Access-Control-Allow-Origin');
+  headers.delete('Access-Control-Allow-Credentials');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
