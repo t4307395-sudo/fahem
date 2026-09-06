@@ -18,8 +18,10 @@ function normalizeRow(raw, rowNumber) {
   const item = {
     row: rowNumber,
     subject: clean(row.subject, 160),
+    unit: clean(row.unit, 160) || 'الوحدة الأولى',
     chapter: clean(row.chapter || row.lesson, 160),
     school_year: clean(row.school_year, 80),
+    educational_stage: clean(row.educational_stage || row.stage, 80),
     type,
     prompt: clean(row.prompt, 20000),
     options,
@@ -89,7 +91,7 @@ export async function onRequestPost({ request, env }) {
     else { keys.add(key); unique.push(q); }
   }
   if (!unique.length) return json({ ok: true, imported: 0, duplicates, message: 'كل الأسئلة موجودة مسبقًا' });
-  const statements = unique.map(q => env.DB.prepare('INSERT INTO questions(subject,lesson,school_year,type,prompt,options_json,correct_answer,explanation,difficulty) VALUES(?,?,?,?,?,?,?,?,?)').bind(q.subject, q.chapter, q.school_year || null, q.type, q.prompt, JSON.stringify(q.options), q.correct_answer || null, q.explanation || null, q.difficulty));
+  const statements = unique.map(q => env.DB.prepare('INSERT INTO questions(subject,unit,lesson,school_year,educational_stage,type,prompt,options_json,correct_answer,explanation,difficulty,is_published) VALUES(?,?,?,?,?,?,?,?,?,?,?,1)').bind(q.subject, q.unit, q.chapter, q.school_year || null, q.educational_stage || null, q.type, q.prompt, JSON.stringify(q.options), q.correct_answer || null, q.explanation || null, q.difficulty));
   await env.DB.batch(statements);
   return json({ ok: true, imported: unique.length, duplicates });
 }
