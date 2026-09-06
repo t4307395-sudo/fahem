@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS login_rate_limits (key TEXT PRIMARY KEY,window_start INTEGER NOT NULL,attempts INTEGER NOT NULL DEFAULT 0);
