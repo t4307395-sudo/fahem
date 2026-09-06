@@ -3,7 +3,7 @@ import { json, me, requireTeacher, limitText, originGuard } from '../_shared.js'
 
 const TYPES = new Set(['mcq', 'boolean', 'essay']);
 const DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
-const REQUIRED = ['subject', 'chapter', 'school_year', 'type', 'prompt', 'difficulty'];
+const REQUIRED = ['subject', 'unit', 'chapter', 'school_year', 'educational_stage', 'type', 'prompt', 'difficulty'];
 
 function clean(value, max = 20000) {
   return limitText(String(value ?? '').trim(), max);
@@ -18,8 +18,11 @@ function normalizeRow(raw, rowNumber) {
   const item = {
     row: rowNumber,
     subject: clean(row.subject, 160),
+    unit: clean(row.unit, 160) || 'الوحدة الأولى',
     chapter: clean(row.chapter || row.lesson, 160),
     school_year: clean(row.school_year, 80),
+    educational_stage: clean(row.educational_stage || row.stage, 120),
+    is_published: String(row.is_published ?? row.published ?? '1').toLowerCase() !== '0' && String(row.is_published ?? row.published ?? '1').toLowerCase() !== 'false',
     type,
     prompt: clean(row.prompt, 20000),
     options,
@@ -80,16 +83,16 @@ export async function onRequestPost({ request, env }) {
   const payload = await request.json().catch(() => ({}));
   parsed = jsonRows(payload.rows);
   if (parsed.errors.length) return json({ error: 'يوجد أخطاء في الملف', errors: parsed.errors, valid: parsed.rows.length }, 400);
-  const existing = await env.DB.prepare('SELECT subject, lesson, prompt FROM questions').all();
-  const keys = new Set((existing.results || []).map(q => `${q.subject}\u0000${q.lesson}\u0000${q.prompt}`));
+  const existing = await env.DB.prepare('SELECT subject, unit, lesson, school_year, educational_stage, prompt FROM questions').all();
+  const keys = new Set((existing.results || []).map(q => `${q.educational_stage}\u0000${q.school_year}\u0000${q.subject}\u0000${q.unit}\u0000${q.lesson}\u0000${q.prompt}`));
   const unique = [], duplicates = [];
   for (const q of parsed.rows) {
-    const key = `${q.subject}\u0000${q.chapter}\u0000${q.prompt}`;
+    const key = `${q.educational_stage}\u0000${q.school_year}\u0000${q.subject}\u0000${q.unit}\u0000${q.chapter}\u0000${q.prompt}`;
     if (keys.has(key)) duplicates.push(q.row);
     else { keys.add(key); unique.push(q); }
   }
   if (!unique.length) return json({ ok: true, imported: 0, duplicates, message: 'كل الأسئلة موجودة مسبقًا' });
-  const statements = unique.map(q => env.DB.prepare('INSERT INTO questions(subject,lesson,school_year,type,prompt,options_json,correct_answer,explanation,difficulty) VALUES(?,?,?,?,?,?,?,?,?)').bind(q.subject, q.chapter, q.school_year || null, q.type, q.prompt, JSON.stringify(q.options), q.correct_answer || null, q.explanation || null, q.difficulty));
+  const statements = unique.map(q => env.DB.prepare('INSERT INTO questions(subject,unit,lesson,school_year,educational_stage,type,prompt,options_json,correct_answer,explanation,difficulty,is_published) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)').bind(q.subject, q.unit, q.chapter, q.school_year || null, q.educational_stage || null, q.type, q.prompt, JSON.stringify(q.options), q.correct_answer || null, q.explanation || null, q.difficulty, q.is_published ? 1 : 0));
   await env.DB.batch(statements);
   return json({ ok: true, imported: unique.length, duplicates });
 }
