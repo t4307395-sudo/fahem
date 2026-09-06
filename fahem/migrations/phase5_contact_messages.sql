@@ -1,1 +1,0 @@
-CREATE TABLE IF NOT EXISTS contact_messages (id INTEGER PRIMARY KEY AUTOINCREMENT,sender_email TEXT NOT NULL,sender_name TEXT NOT NULL,message TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'new' CHECK(status IN ('new','read','closed')),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
