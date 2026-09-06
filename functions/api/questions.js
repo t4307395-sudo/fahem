@@ -2,7 +2,10 @@ import { json, body, me, requireTeacher, optionsJson, limitText, originGuard } f
 
 export async function onRequestGet({ request, env }) {
   const user = await me(request, env); const teacher = ['admin','teacher'].includes(user?.role);
-  if (!user) return json({ questions: [] }, 401);
+  if (!user) {
+    const rows = await env.DB.prepare(`SELECT q.id,q.subject,q.unit,q.lesson,q.school_year,q.educational_stage,q.type,q.prompt,q.options_json,q.correct_answer,q.explanation,q.difficulty,q.created_at,q.updated_at,q.lesson AS chapter FROM questions q WHERE q.is_published=1 ORDER BY q.school_year,q.subject,q.id`).all();
+    return json({ questions: (rows.results||[]).map(q=>({...q,options:optionsJson(q.options_json)})), guest:true });
+  }
   const columns = teacher ? 'q.*' : 'q.id,q.subject,q.unit,q.lesson,q.school_year,q.educational_stage,q.type,q.prompt,q.options_json,q.explanation,q.difficulty,q.created_at,q.updated_at';
   if (!teacher && user?.role === 'student') {
     const profile = await env.DB.prepare("SELECT educational_stage,school_year FROM users WHERE id=? AND role='student'").bind(user.id).first();
