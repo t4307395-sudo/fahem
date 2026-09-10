@@ -9,7 +9,7 @@ const auth=readFileSync(new URL('../functions/api/auth.js',import.meta.url),'utf
 
 describe('Textbook question bank SPA contract',()=>{
  it('keeps one Arabic RTL application shell',()=>{expect(html).toContain('<html lang="ar" dir="rtl">');expect(html).toContain('id="app"');expect(html).toContain('/styles.css');expect(html).toContain('/app.js?');});
-  it('starts with the two requested journeys',()=>{expect(app).toContain('بنك أسئلة الكتاب المدرسي');expect(app).toContain("startJourney('review')");expect(app).toContain("startJourney('exam')");});
+  it('starts with the two requested journeys',()=>{expect(app).toContain('فاهم');expect(app).toContain("startJourney('review')");expect(app).toContain("startJourney('exam')");});
  it('lets students enter the study journeys without authentication',()=>{expect(app).toContain("function startJourney(mode){state.mode=mode");expect(app).not.toContain("if(!state.user){state.authMode='login'");expect(readFileSync(new URL('../functions/api/questions.js',import.meta.url),'utf8')).toContain('guest:true');});
  it('provides the year then setup flow in the same SPA',()=>{expect(app).toContain('function yearPicker()');expect(app).toContain('function chooseYear(y)');expect(app).toContain("state.page==='reviewSetup'");expect(app).toContain("state.page==='examSetup'");});
  it('supports lesson, question count, and exam duration choices',()=>{expect(app).toContain('id="lesson"');expect(app).toContain('id="count"');expect(app).toContain('id="minutes"');expect(app).toContain('function beginStudy(mode)');});
